@@ -2,10 +2,6 @@
 
 Rust version of [miloyip/svpng](https://github.com/miloyip/svpng).
 
-## Features
-
-totally the same as miloyip's `svpng`
-
 ## Usage
 
 Either using the `svpng` crate or just copy the `src/lib.rs` somewhere you want.
@@ -47,8 +43,8 @@ fn main() -> io::Result<()> {
 
     Ok(())
 }
-
 ```
+
 ---
 
 RGB
