@@ -5,8 +5,21 @@ use std::path::Path;
 
 const MAGIC_NUMBER: [u8; 8] = [137, 80, 78, 71, 13, 10, 26, 10];
 
-// svpng save pixels to png file
-// color types 2 and 6 (truecolor and truecolor with alpha) are supported
+/// `svpng` save pixels to png file,
+/// color types 2 and 6 (truecolor and truecolor with alpha) are supported
+/// ## Example:
+/// ```no_run
+/// // RGB
+/// let mut pix = Vec::new();
+/// for y in 0..=255 {
+///     for x in 0..=255 {
+///         pix.push(x);
+///         pix.push(y);
+///        pix.push(128);
+///     }
+/// }
+/// svpng("rgb.png", 256, 256, &pix, false)?;
+/// ```
 pub fn svpng<P: AsRef<Path>>(
     path: P,
     w: u32,
