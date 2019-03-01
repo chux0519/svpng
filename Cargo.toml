@@ -1,6 +1,6 @@
 [package]
 name = "svpng"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["chux0519 <chuxdesign@hotmail.com>"]
 edition = "2018"
 description = "A small function for saving RGB/RGBA image into uncompressed PNG"
