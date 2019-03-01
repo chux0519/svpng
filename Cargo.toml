@@ -3,6 +3,8 @@ name = "svpng"
 version = "0.1.0"
 authors = ["chux0519 <chuxdesign@hotmail.com>"]
 edition = "2018"
+description = "A small function for saving RGB/RGBA image into uncompressed PNG"
+license = "CC0-1.0"
 
 [dependencies]
 

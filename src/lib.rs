@@ -24,11 +24,11 @@ pub fn svpng<P: AsRef<Path>>(
         .open(path)?;
 
     // Write magic number
-    file.write(&MAGIC_NUMBER)?;
+    file.write_all(&MAGIC_NUMBER)?;
 
     // Write IHDR, see https://en.wikipedia.org/wiki/Portable_Network_Graphics#File_format
     {
-        file.write(&be_u32(13))?; // LENGTH
+        file.write_all(&be_u32(13))?; // LENGTH
         let mut buf = "IHDR".chars().map(|x| x as u8).collect::<Vec<u8>>(); // TYPE
                                                                             // DATA {
         buf.extend_from_slice(&be_u32(w)); // width (4 bytes)
@@ -37,8 +37,8 @@ pub fn svpng<P: AsRef<Path>>(
         buf.extend_from_slice(&[if is_alpha { 6u8 } else { 2u8 }]); // color type (1 byte)
         buf.extend_from_slice(&[0u8, 0u8, 0u8]); // compression method (1 byte), filter method (1 byte), and interlace method (1 byte)
                                                  // }
-        file.write(&buf)?;
-        file.write(&be_u32(crc32(&buf)))?;
+        file.write_all(&buf)?;
+        file.write_all(&be_u32(crc32(&buf)))?;
     }
 
     // IDAT
@@ -62,17 +62,17 @@ pub fn svpng<P: AsRef<Path>>(
             }
         }
         buf.extend_from_slice(&be_u32(adler32(pix)));
-        file.write(&be_u32(buf.len() as u32 - 4))?; // LEN
-        file.write(&buf)?; // TYPE + DATA
-        file.write(&be_u32(crc32(&buf)))?;
+        file.write_all(&be_u32(buf.len() as u32 - 4))?; // LEN
+        file.write_all(&buf)?; // TYPE + DATA
+        file.write_all(&be_u32(crc32(&buf)))?;
     }
 
     // IEND
     {
-        file.write(&be_u32(0))?;
+        file.write_all(&be_u32(0))?;
         let buf = "IEND".chars().map(|x| x as u8).collect::<Vec<u8>>(); // TYPE
-        file.write(&buf)?;
-        file.write(&be_u32(crc32(&buf)))?;
+        file.write_all(&buf)?;
+        file.write_all(&be_u32(crc32(&buf)))?;
     }
     Ok(())
 }
@@ -89,7 +89,7 @@ fn adler32(pix: &[u8]) -> u32 {
     let mut s1 = 1u32;
     let mut s2 = 0u32;
     for p in pix.iter() {
-        s1 += p.clone() as u32;
+        s1 += u32::from(*p);
         if s1 >= 65521 {
             s1 -= 65521
         }
@@ -104,6 +104,7 @@ fn adler32(pix: &[u8]) -> u32 {
 // CRC32
 
 // Ref: http://web.mit.edu/freebsd/head/sys/libkern/crc32.c
+#[allow(clippy::unreadable_literal)]
 const CRC32_TAB: [u32; 256] = [
     0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f, 0xe963a535, 0x9e6495a3,
     0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988, 0x09b64c2b, 0x7eb17cbd, 0xe7b82d07, 0x90bf1d91,
@@ -140,11 +141,11 @@ const CRC32_TAB: [u32; 256] = [
 ];
 
 pub fn crc32(buf: &[u8]) -> u32 {
-    let mut crc = 0xFFFFFFFFu32;
+    let mut crc = !0u32;
     for x in buf.iter() {
-        crc = CRC32_TAB[((crc ^ x.clone() as u32) & 0xFF) as usize] ^ (crc >> 8);
+        crc = CRC32_TAB[((crc ^ u32::from(*x)) & 0xFF) as usize] ^ (crc >> 8);
     }
-    crc ^ 0xFFFFFFFFu32
+    crc ^ !0u32
 }
 
 #[cfg(test)]
